@@ -1,0 +1,13 @@
+{
+  "recommendations": [
+{%- if values.language == "typescript" %}
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "vitest.explorer"
+{%- else %}
+    "charliermarsh.ruff",
+    "ms-python.python",
+    "ms-python.mypy-type-checker"
+{%- endif %}
+  ]
+}

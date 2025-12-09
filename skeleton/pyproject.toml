@@ -1,0 +1,48 @@
+{%- if values.language == "python" %}
+[project]
+name = "${{ values.name }}"
+version = "0.1.0"
+description = "${{ values.description }}"
+readme = "README.md"
+requires-python = ">=${{ values.pythonVersion }}"
+dependencies = [
+    "mcp>=1.0.0",
+    "pydantic>=2.10.0",
+{%- if values.enableDatabase %}
+    "asyncpg>=0.30.0",
+    "aiosqlite>=0.20.0",
+{%- endif %}
+{%- if values.enableHttp %}
+    "httpx>=0.28.0",
+{%- endif %}
+{%- if values.enableGitHub %}
+    "pygithub>=2.5.0",
+{%- endif %}
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "pytest-asyncio>=0.24",
+    "ruff>=0.8",
+    "mypy>=1.13",
+]
+
+[project.scripts]
+${{ values.name }} = "src.server:main"
+
+[tool.ruff]
+line-length = 100
+target-version = "py${{ values.pythonVersion | replace('.', '') }}"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W", "UP"]
+
+[tool.mypy]
+python_version = "${{ values.pythonVersion }}"
+strict = true
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+{%- endif %}

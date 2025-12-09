@@ -1,0 +1,57 @@
+{%- if values.language == "typescript" %}
+{
+  "name": "${{ values.name }}",
+  "version": "0.1.0",
+  "description": "${{ values.description }}",
+  "type": "module",
+  "bin": {
+    "${{ values.name }}": "./build/index.js"
+  },
+  "scripts": {
+    "build": "tsc && chmod 755 build/index.js",
+    "dev": "tsx watch src/index.ts",
+    "start": "node build/index.js",
+    "test": "vitest",
+    "test:coverage": "vitest --coverage",
+    "lint": "eslint src tests",
+    "lint:fix": "eslint src tests --fix",
+    "typecheck": "tsc --noEmit",
+    "inspect": "npx @modelcontextprotocol/inspector node build/index.js",
+    "clean": "rm -rf build"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "zod": "^3.25.0"
+{%- if values.enableDatabase %},
+    "pg": "^8.13.0",
+    "better-sqlite3": "^11.0.0"
+{%- endif %}
+{%- if values.enableHttp %},
+    "node-fetch": "^3.3.0"
+{%- endif %}
+{%- if values.enableGitHub %},
+    "@octokit/rest": "^21.0.0"
+{%- endif %}
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+{%- if values.enableDatabase %}
+    "@types/pg": "^8.11.0",
+    "@types/better-sqlite3": "^7.6.0",
+{%- endif %}
+    "typescript": "^5.7.0",
+    "tsx": "^4.19.0",
+    "vitest": "^2.1.0",
+    "@vitest/coverage-v8": "^2.1.0",
+    "eslint": "^9.15.0",
+    "@typescript-eslint/eslint-plugin": "^8.15.0",
+    "@typescript-eslint/parser": "^8.15.0"
+  },
+  "files": [
+    "build"
+  ],
+  "engines": {
+    "node": ">=${{ values.nodeVersion }}"
+  }
+}
+{%- endif %}
