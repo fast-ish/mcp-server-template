@@ -1,0 +1,8 @@
+apiVersion: backstage.io/v1alpha1
+kind: Location
+metadata:
+  name: mcp-server-template
+  description: MCP Server template for building Model Context Protocol servers
+spec:
+  targets:
+    - ./template.yaml
