@@ -1,0 +1,26 @@
+# =============================================================================
+# ARGO CI CONFIGURATION
+# =============================================================================
+{%- if values.language == "typescript" %}
+language: node
+{%- else %}
+language: python
+{%- endif %}
+team: ${{values.owner | replace("group:", "") | replace("team-", "")}}
+
+config:
+{%- if values.language == "typescript" %}
+  node-version: "${{values.nodeVersion}}"
+  package-manager: "${{values.packageManager}}"
+{%- else %}
+  python-version: "${{values.pythonVersion}}"
+  package-manager: "${{values.packageManager}}"
+{%- endif %}
+  skip-tests: false
+{%- if values.deployment == "docker" or values.deployment == "lambda" %}
+  deploy-enabled: true
+  rollout-strategy: canary
+{%- else %}
+  # Local MCP servers are not deployed to Kubernetes
+  deploy-enabled: false
+{%- endif %}

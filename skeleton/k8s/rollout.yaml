@@ -1,0 +1,60 @@
+{%- if values.deployment == "docker" %}
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: ${{values.name}}
+  labels:
+    app.kubernetes.io/name: ${{values.name}}
+    app.kubernetes.io/component: mcp-server
+    fasti.sh/template: mcp-server
+spec:
+  replicas: 2
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: ${{values.name}}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: ${{values.name}}
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "3000"
+    spec:
+      serviceAccountName: ${{values.owner | replace("group:", "") | replace("team-", "")}}-workload
+      containers:
+        - name: ${{values.name}}
+          image: IMAGE_PLACEHOLDER:latest
+          ports:
+            - name: http
+              containerPort: 3000
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 5
+  strategy:
+    canary:
+      steps:
+        - setWeight: 25
+        - pause: {duration: 1m}
+        - setWeight: 75
+        - pause: {duration: 1m}
+      maxUnavailable: 0
+      maxSurge: 1
+{%- else %}
+# This MCP server is deployed as: ${{values.deployment}}
+# Kubernetes manifests are not applicable for this deployment type.
+{%- endif %}

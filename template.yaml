@@ -234,6 +234,11 @@ spec:
         defaultBranch: main
         protectDefaultBranch: true
         repoVisibility: private
+        topics:
+          - mcp
+          - ai
+          - ${{ parameters.language }}
+          - ${{ parameters.owner }}
 
     - id: register
       name: Register Component
@@ -241,6 +246,38 @@ spec:
       input:
         repoContentsUrl: ${{ steps.publish.output.repoContentsUrl }}
         catalogInfoPath: /catalog-info.yaml
+
+    - id: create-gitops-pr
+      name: Create GitOps Pull Request
+      if: ${{ parameters.deployment == "docker" }}
+      action: publish:github:pull-request
+      input:
+        repoUrl: github.com?owner=fast-ish&repo=aws-idp-gitops
+        branchName: add-app-${{ parameters.name }}
+        title: "feat(${{ parameters.name }}): add new mcp server"
+        description: |
+          ## New Application: ${{ parameters.name }}
+
+          This PR adds a new MCP Server to the GitOps repository.
+
+          ### Application Details
+          | Property | Value |
+          |----------|-------|
+          | **Name** | ${{ parameters.name }} |
+          | **Owner** | ${{ parameters.owner }} |
+          | **Type** | MCP Server |
+          | **Language** | ${{ parameters.language }} |
+          | **Deployment** | ${{ parameters.deployment }} |
+
+          ### MCP Capabilities
+          - **Tools**: ${{ parameters.enableTools }}
+          - **Resources**: ${{ parameters.enableResources }}
+          - **Prompts**: ${{ parameters.enablePrompts }}
+
+          ---
+          *Created via Backstage MCP Server Template*
+        sourcePath: k8s
+        targetPath: teams/${{ parameters.owner | replace("group:", "") | replace("team-", "") }}/apps/${{ parameters.name }}
 
   output:
     links:
